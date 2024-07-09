@@ -1,4 +1,4 @@
-package fse
+package filesystemhtml
 
 import (
 	"fmt"
@@ -70,4 +70,42 @@ func (f *FSEntry) IsChildOfReadableParents() bool {
 		}
 	}
 	return canread
+}
+
+var DocIcons = map[string]string{
+	".mp4":  "video_file",
+	".m4v":  "video_file",
+	".avi":  "video_file",
+	".flv":  "video_file",
+	".wmv":  "video_file",
+	".mp3":  "audio_file",
+	".ogg":  "audio_file",
+	".wav":  "audio_file",
+	".aac":  "audio_file",
+	".pdf":  "picture_as_pdf",
+	".doc":  "document",
+	".docx": "document",
+	".txt":  "article",
+	".jpg":  "image",
+	".jpeg": "image",
+	".png":  "image",
+	".gif":  "image",
+}
+
+func (s *FSEntry) SetFileIcon() string {
+	const (
+		DEFAULT = "file_open"
+		HTM     = `&nbsp;<span class="material-icons">%s</span>`
+	)
+
+	icon := DEFAULT
+
+	for k, v := range DocIcons {
+		sfx := strings.HasSuffix(s.Name, k)
+		if sfx {
+			icon = v
+			break
+		}
+	}
+	return fmt.Sprintf(HTM, icon)
 }

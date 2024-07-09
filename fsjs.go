@@ -1,4 +1,4 @@
-package fse
+package filesystemhtml
 
 import (
 	"fmt"

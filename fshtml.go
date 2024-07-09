@@ -1,4 +1,4 @@
-package fse
+package filesystemhtml
 
 import (
 	"cmp"
@@ -181,7 +181,8 @@ func onedochtml(f FSEntry) string {
 
 	if f.IsUniversalRead() {
 		// toadd := DOWN + MyFStyle.Docu + fmt.Sprintf(FNOD, f.Inode)
-		toadd := fmt.Sprintf(FNOD, f.Inode) + DOWN + MyFStyle.Docu
+		// toadd := fmt.Sprintf(FNOD, f.Inode) + DOWN + MyFStyle.Docu
+		toadd := fmt.Sprintf(FNOD, f.Inode) + DOWN + f.SetFileIcon()
 		chunks = append(chunks, toadd)
 	} else {
 		chunks = append(chunks, MyFStyle.Bloc)

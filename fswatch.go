@@ -1,4 +1,4 @@
-package fse
+package filesystemhtml
 
 import (
 	"cmp"
@@ -49,7 +49,7 @@ func WatchFS() {
 
 	// Watch this folder for changes.
 	if err := w.AddRecursive(FSDir); err != nil {
-		fmt.Printf("watchfs() can not open Config.FServeDir: %s\n", FSDir)
+		fmt.Printf("watchfs() can not open FServeDir: %s\n", FSDir)
 		return
 	}
 
