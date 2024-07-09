@@ -8,6 +8,8 @@ as a package: start `filesystemhtml.WatchFS()` and then query `filesystemhtml.FS
 
 `FSResponse[1]` is js to display that html
 
+nb: assuming you have access to `jQuery` and `Material Icons`
+
 ```
 % tree
 .
