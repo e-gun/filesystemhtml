@@ -175,7 +175,7 @@ func finfintofsentry(p string, f fs.FileInfo) FSEntry {
 	fi, e2 := os.Stat(p)
 	if e2 != nil {
 		// the file disappeared on you...
-		fmt.Printf("buildwatcherentries() could not os.Stat(path) for '%s'\n", p)
+		fmt.Printf("finfintofsentry() could not os.Stat(path) for '%s'\n", p)
 		return FSEntry{}
 	}
 
@@ -218,7 +218,7 @@ func contentsofthisdirectory(d FSEntry) []FSEntry {
 			fmt.Println(fmt.Sprintf("contentsofthisdirectory() fi.Info() failed for '%s'", fi.Name()))
 			continue
 		}
-		ent := finfintofsentry(d.MyRelativePath(), inf)
+		ent := finfintofsentry(AbsPath+d.MyRelativePath(), inf)
 		contents = append(contents, ent)
 	}
 
