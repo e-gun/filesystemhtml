@@ -20,9 +20,8 @@ const (
 // material icons
 const (
 	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>`
-	MILOCK   = `<span class="material-icons">folder_supervised</span>`
-	MIBLOCK  = `<span class="material-icons color2">locked</span>`
-	MIFC     = `<span class="material-icons color1">folder</span>`
+	MILOCK   = `<span class="material-icons coolblue">locked</span>`
+	MIFC     = `<span class="material-icons orange">folder</span>`
 	MIFO     = `<span class="material-icons">folder_open</span>`
 	MIUNLOCK = `<span class="material-icons">folder_supervised</span>`
 )
@@ -30,7 +29,6 @@ const (
 type FStyle struct {
 	Docu   string
 	Lock   string
-	Bloc   string
 	Clp    string
 	Opn    string
 	Unlock string
@@ -40,7 +38,6 @@ var (
 	MyFStyle = FStyle{
 		Docu:   MIDOCU,
 		Lock:   MILOCK,
-		Bloc:   MIBLOCK,
 		Clp:    MIFC,
 		Opn:    MIFO,
 		Unlock: MIUNLOCK,
@@ -146,7 +143,7 @@ func onedirhtml(f FSEntry) string {
 	if f.IsUniversalRead() {
 		chunks = append(chunks, fmt.Sprintf(TEMPL, f.Inode, MyFStyle.Opn, f.Inode, MyFStyle.Clp))
 	} else {
-		chunks = append(chunks, MyFStyle.Bloc)
+		chunks = append(chunks, MyFStyle.Lock)
 	}
 
 	chunks = append(chunks, fmt.Sprintf(SPANA, f.Inode, f.Name))
@@ -180,12 +177,10 @@ func onedochtml(f FSEntry) string {
 	}
 
 	if f.IsUniversalRead() {
-		// toadd := DOWN + MyFStyle.Docu + fmt.Sprintf(FNOD, f.Inode)
-		// toadd := fmt.Sprintf(FNOD, f.Inode) + DOWN + MyFStyle.Docu
 		toadd := fmt.Sprintf(FNOD, f.Inode) + DOWN + f.SetFileIcon()
 		chunks = append(chunks, toadd)
 	} else {
-		chunks = append(chunks, MyFStyle.Bloc)
+		chunks = append(chunks, MyFStyle.Lock)
 	}
 
 	chunks = append(chunks, fmt.Sprintf(FINF, f.Name, f.Size))
