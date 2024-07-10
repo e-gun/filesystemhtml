@@ -7,7 +7,7 @@ import (
 
 func insertfilejs() string {
 	var directories []FSEntry
-	for _, f := range ServingFiles {
+	for _, f := range ServingFiles.ReadAll() {
 		if f.IsDir {
 			directories = append(directories, f)
 		}

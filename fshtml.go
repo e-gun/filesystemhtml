@@ -52,7 +52,7 @@ func fsdeephtml() string {
 		DIV = "<div id=\"%d\">%s</div>\n"
 	)
 
-	if len(ServingFiles) == 0 {
+	if ServingFiles.GetLen() == 0 {
 		return ""
 	}
 
@@ -65,7 +65,7 @@ func fsdeephtml() string {
 	var itemsattop []FSEntry
 
 	var directories []FSEntry
-	for _, f := range ServingFiles {
+	for _, f := range ServingFiles.ReadAll() {
 		if f.IsDir {
 			directories = append(directories, f)
 		}

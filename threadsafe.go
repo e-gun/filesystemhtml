@@ -42,6 +42,12 @@ func (ss *servingslice) SortByName() {
 	return
 }
 
+func (ss *servingslice) GetLen() int {
+	ss.mutex.Lock()
+	defer ss.mutex.Unlock()
+	return len(ss.FSEs)
+}
+
 func makeservingmap() servingmap {
 	return servingmap{
 		EntryMap: make(map[uint64]FSEntry),
@@ -82,4 +88,10 @@ func (sm *servingmap) ReadAll() map[uint64]FSEntry {
 	sm.mutex.Lock()
 	defer sm.mutex.Unlock()
 	return sm.EntryMap
+}
+
+func (sm *servingmap) GetLen() int {
+	sm.mutex.Lock()
+	defer sm.mutex.Unlock()
+	return len(sm.EntryMap)
 }
