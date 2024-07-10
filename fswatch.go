@@ -20,8 +20,8 @@ import (
 var (
 	ServingFiles []FSEntry
 	AbsPath      string
-	ServingDirs  = make(map[uint64]FSEntry)
-	ServeFileMap = make(map[uint64]FSEntry)
+	ServingDirs  = makeservingmap()
+	ServeFileMap = makeservingmap()
 	FSResponse   [2]string
 	FSDir        string
 )
@@ -49,7 +49,8 @@ func WatchFS() {
 
 	// Watch this folder for changes.
 	if err := w.AddRecursive(FSDir); err != nil {
-		fmt.Printf("watchfs() can not open FServeDir: %s\n", FSDir)
+		// nb: crazy inner folder permissions can kill this: 640, e.g, when you need 750 for the 'x'
+		fmt.Printf("WatchFS() can not open FServeDir: %s\n", FSDir)
 		return
 	}
 
@@ -64,8 +65,8 @@ func WatchFS() {
 func reloadfsinfo(w *watcher.Watcher) {
 	ServingFiles = buildwatcherentries(w)
 	slices.SortFunc(ServingFiles, func(a, b FSEntry) int { return cmp.Compare(a.RelPath, b.RelPath) })
-	ServeFileMap = buildwatcherfmap()
-	ServingDirs = buildwatcherdirmap()
+	ServeFileMap.WriteAll(buildwatcherfmap())
+	ServingDirs.WriteAll(buildwatcherdirmap())
 	populaterestrictions()
 	FSResponse = buildfsresponse()
 }
@@ -102,17 +103,19 @@ func buildwatcherdirmap() map[uint64]FSEntry {
 }
 
 func populaterestrictions() {
-	for _, d := range ServingDirs {
-		checkforuserrestrictionatthislevel(&d)
+	for _, d := range ServingDirs.ReadAll() {
+		newd := checkforuserrestrictionatthislevel(d)
+		ServingDirs.WriteOne(newd)
 	}
-	for _, d := range ServingDirs {
-		checkforuserrestrictionabove(&d)
+	for _, d := range ServingDirs.ReadAll() {
+		newd := checkforuserrestrictionabove(d)
+		ServingDirs.WriteOne(newd)
 	}
 }
 
-func checkforuserrestrictionatthislevel(d *FSEntry) {
+func checkforuserrestrictionatthislevel(d FSEntry) FSEntry {
 	var restrict []string
-	contents := contentsofthisdirectory(*d)
+	contents := contentsofthisdirectory(d)
 	for _, c := range contents {
 		if strings.HasPrefix(c.Name, RESTRICTPREFIX) {
 			u, _ := strings.CutPrefix(c.Name, RESTRICTPREFIX)
@@ -124,14 +127,17 @@ func checkforuserrestrictionatthislevel(d *FSEntry) {
 	for _, u := range restrict {
 		d.Users[u] = true
 	}
+	return d
 }
 
-func checkforuserrestrictionabove(d *FSEntry) {
+func checkforuserrestrictionabove(d FSEntry) FSEntry {
 	for p := range d.Parents {
-		for u := range ServeFileMap[p].Users {
+		ff := ServeFileMap.ReadOne(p)
+		for u := range ff.Users {
 			d.Users[u] = true
 		}
 	}
+	return d
 }
 
 func buildwatcherentries(w *watcher.Watcher) []FSEntry {
@@ -146,62 +152,33 @@ func buildwatcherentries(w *watcher.Watcher) []FSEntry {
 			// skip FSDir itself
 			continue
 		}
-		var thisentry FSEntry
-		thisentry.RelPath, _ = strings.CutPrefix(path, abs+"/")
-		thisentry.Mode = f.Mode()
-		thisentry.IsDir = f.Mode().IsDir()
-		thisentry.Genealogy = strings.Split(thisentry.RelPath, "/")
-		thisentry.Level = len(thisentry.Genealogy)
-		thisentry.Name = f.Name()
-		fi, e2 := os.Stat(path)
-		if e2 != nil {
-			// the file disappeared on you...
-			fmt.Printf("loadwatcherentries() could not os.Stat(path) for '%s'\n", path)
-			continue
-		}
-		stat, ok := fi.Sys().(*syscall.Stat_t)
-		if !ok {
-			// fmt.Printf("unable to find inode via syscall.Stat_t")
-		} else {
-			thisentry.Inode = stat.Ino
-		}
-
-		if !thisentry.IsDir {
-			thisentry.Size = fmt.Sprintf("%s", humanize.Bytes(uint64(stat.Size)))
-		}
-
-		if strings.HasPrefix(thisentry.Name, RESTRICTPREFIX) {
-			thisentry.IsHidden = true
-		}
-
-		thisentry.Users = make(map[string]bool)
-		thisentry.Contents = make(map[uint64]bool)
-		thisentry.Parents = make(map[uint64]bool)
-
+		thisentry := finfintofsentry(path, f)
 		entries = append(entries, thisentry)
 	}
 	slices.SortFunc(entries, func(a, b FSEntry) int { return cmp.Compare(a.RelPath, b.RelPath) })
 	return entries
 }
 
-func buildfsentryfromfinfo(d FSEntry, f fs.FileInfo) FSEntry {
-	// DRY issues with buildwatcherentries
-
-	path := AbsPath + d.MyRelativePath()
+func finfintofsentry(p string, f fs.FileInfo) FSEntry {
+	abs, err := filepath.Abs(FSDir)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	var thisentry FSEntry
-	thisentry.RelPath, _ = strings.CutPrefix(path, AbsPath)
+	thisentry.RelPath, _ = strings.CutPrefix(p, abs+"/")
 	thisentry.Mode = f.Mode()
 	thisentry.IsDir = f.Mode().IsDir()
 	thisentry.Genealogy = strings.Split(thisentry.RelPath, "/")
 	thisentry.Level = len(thisentry.Genealogy)
 	thisentry.Name = f.Name()
-
-	fi, e2 := os.Stat(path + "/" + f.Name())
+	fi, e2 := os.Stat(p)
 	if e2 != nil {
-		fmt.Println(fmt.Sprintf("buildfsentryfromfinfo() os.Stat failed for '%s'", path))
-		return thisentry
+		// the file disappeared on you...
+		fmt.Printf("buildwatcherentries() could not os.Stat(path) for '%s'\n", p)
+		return FSEntry{}
 	}
+
 	stat, ok := fi.Sys().(*syscall.Stat_t)
 	if !ok {
 		// fmt.Printf("unable to find inode via syscall.Stat_t")
@@ -217,10 +194,13 @@ func buildfsentryfromfinfo(d FSEntry, f fs.FileInfo) FSEntry {
 		thisentry.IsHidden = true
 	}
 
+	if strings.HasPrefix(thisentry.Name, ".") {
+		thisentry.IsHidden = true
+	}
+
 	thisentry.Users = make(map[string]bool)
 	thisentry.Contents = make(map[uint64]bool)
 	thisentry.Parents = make(map[uint64]bool)
-
 	return thisentry
 }
 
@@ -238,7 +218,7 @@ func contentsofthisdirectory(d FSEntry) []FSEntry {
 			fmt.Println(fmt.Sprintf("contentsofthisdirectory() fi.Info() failed for '%s'", fi.Name()))
 			continue
 		}
-		ent := buildfsentryfromfinfo(d, inf)
+		ent := finfintofsentry(d.MyRelativePath(), inf)
 		contents = append(contents, ent)
 	}
 
