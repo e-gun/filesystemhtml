@@ -10,6 +10,39 @@ import (
 // THREAD SAFE INFRASTRUCTURE: MUTEX
 //
 
+type fsresp struct {
+	HTML  string
+	JS    string
+	mutex sync.RWMutex
+}
+
+func makefsresp() fsresp {
+	return fsresp{
+		HTML:  "",
+		JS:    "",
+		mutex: sync.RWMutex{},
+	}
+}
+
+func (r *fsresp) Set(html string, js string) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.HTML = html
+	r.JS = js
+}
+
+func (r *fsresp) GetHTML() string {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	return r.HTML
+}
+
+func (r *fsresp) GetJS() string {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	return r.JS
+}
+
 func makeservinslice() servingslice {
 	return servingslice{
 		FSEs:  []FSEntry{},

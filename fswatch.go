@@ -20,7 +20,7 @@ var (
 	ServingFiles = makeservinslice()
 	ServingDirs  = makeservingmap()
 	ServeFileMap = makeservingmap()
-	FSResponse   [2]string
+	FSResponse   = makefsresp()
 	FSDir        string
 )
 
@@ -76,7 +76,7 @@ func reloadfsinfo(w *watcher.Watcher) {
 	//	fmt.Printf("%d - %s\n", k, entry.Name)
 	//}
 
-	FSResponse = buildfsresponse()
+	buildfsresponse()
 }
 
 func findparentfromname(n string) FSEntry {
@@ -235,6 +235,6 @@ func contentsofthisdirectory(d FSEntry) []FSEntry {
 	return contents
 }
 
-func buildfsresponse() [2]string {
-	return [2]string{fsdeephtml(), insertfilejs()}
+func buildfsresponse() {
+	FSResponse.Set(fsdeephtml(), insertfilejs())
 }
