@@ -95,7 +95,7 @@ var DocIcons = map[string]string{
 func (s *FSEntry) SetFileIcon() string {
 	const (
 		DEFAULT = "file_open"
-		HTM     = `&nbsp;<span class="material-icons">%s</span>`
+		HTM     = `&nbsp;<span class="material-icons">%s</span>&nbsp;`
 	)
 
 	icon := DEFAULT

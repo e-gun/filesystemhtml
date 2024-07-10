@@ -17,13 +17,13 @@ const (
 	UNLOCK = `<span class="ui-icon ui-icon-locked"></span>`
 )
 
-// material icons
+// material icons; see also fsentry.go and SetFileIcon()
 const (
-	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>`
-	MILOCK   = `&nbsp;<span class="material-icons">shield_lock</span>`
-	MIFC     = `<span class="material-icons orange">folder</span>`
-	MIFO     = `<span class="material-icons">folder_open</span>`
-	MIUNLOCK = `<span class="material-icons">folder_supervised</span>`
+	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>&nbsp;`
+	MILOCK   = `&nbsp;<span class="material-icons">shield_lock</span>&nbsp;`
+	MIFC     = `<span class="material-icons orange">folder</span>&nbsp;`
+	MIFO     = `<span class="material-icons">folder_open</span>&nbsp;`
+	MIUNLOCK = `<span class="material-icons">folder_supervised</span>&nbsp;`
 )
 
 type FStyle struct {
@@ -168,13 +168,8 @@ func onedochtml(f FSEntry) string {
 	)
 	var chunks []string
 
-	addindent := 1 // this is all about files at the top level of the directory
-	if f.NoIndent {
-		addindent = 0
-	}
-
 	chunks = append(chunks, "\n\t")
-	for _ = range f.Level + addindent {
+	for _ = range f.Level {
 		chunks = append(chunks, SPACER)
 	}
 	chunks = append(chunks, "\n")
