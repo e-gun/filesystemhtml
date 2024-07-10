@@ -38,7 +38,7 @@ func main() {
 	go WatchFS()
 	time.Sleep(100 * time.Millisecond)
 	fmt.Println("html")
-	fmt.Println(FSResponse[0])
+	fmt.Println(FSResponse.GetHTML())
 	fmt.Println("js")
-	fmt.Println(FSResponse[1])
+	fmt.Println(FSResponse.GetJS())
 }
