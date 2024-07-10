@@ -20,7 +20,7 @@ const (
 // material icons
 const (
 	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>`
-	MILOCK   = `&nbsp;<span class="material--icons">lock</span>`
+	MILOCK   = `&nbsp;<span class="material-icons">shield_lock</span>`
 	MIFC     = `<span class="material-icons orange">folder</span>`
 	MIFO     = `<span class="material-icons">folder_open</span>`
 	MIUNLOCK = `<span class="material-icons">folder_supervised</span>`
