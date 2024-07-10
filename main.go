@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-// as a package: start filesystemhtml.WatchFS() and then query filesystemhtml.FSResponse as needed
-
 func main() {
 	const (
 		HELP = `

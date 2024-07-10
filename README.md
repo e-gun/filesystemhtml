@@ -2,13 +2,12 @@
 
 the directory is watched; modifications are reflected in the output 
 
-as a package: start `filesystemhtml.WatchFS()` and then query `filesystemhtml.FSResponse` as needed
+as a package:
+1. set `filesystemhtml.AbsPath` and `filesystemhtml.FSDir`
+1. start `filesystemhtml.WatchFS()`
+1. query `filesystemhtml.FSResponse.GetHTML()` and `filesystemhtml.FSResponse.GetJS()` as needed
 
-`FSResponse[0]` is html
-
-`FSResponse[1]` is js to display that html
-
-nb: assuming you have access to `jQuery` and `Material Icons`
+nb: assuming you have access to `jQuery` and `Material Symbols`
 
 ```
 % tree
@@ -16,12 +15,25 @@ nb: assuming you have access to `jQuery` and `Material Icons`
 ├── adir
 │   ├── aa1
 │   ├── asubdir
-│   └── asubdir2
-│       ├── f1
-│       └── f2
+│   ├── asubdir2
+│   │   ├── f1
+│   │   └── f2
+│   ├── img.jpg
+│   ├── mv.avi
+│   ├── p.pdf
+│   └── wd.doc
 ├── afile.txt
 ├── bdir
+│   ├── lock.txt
+│   ├── prot
+│   │   ├── pf1.txt
+│   │   └── pf2.png
+│   └── pwd
+│       ├── bleh
+│       └── z_user_is_user2
 └── bfile.txt
+
+7 directories, 14 files
 
 ```
 

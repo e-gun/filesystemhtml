@@ -32,13 +32,7 @@ func WatchFS() {
 			select {
 			case event := <-w.Event:
 				// fmt.Println(event) // Print the event's info.
-				if event.Op.String() == "CREATE" || event.Op.String() == "REMOVE" || event.Op.String() == "MOVE" {
-					// this can be too fast: file might not exist yet
-					time.Sleep(time.Millisecond * 10)
-					reloadfsinfo(w)
-				} else {
-					fmt.Printf("WatchFS() saw and skipped event.Op.String() '%s'\n", event.Op.String())
-				}
+				piceventaction(event, w)
 			case err := <-w.Error:
 				log.Fatalln(err)
 			case <-w.Closed:
@@ -62,6 +56,25 @@ func WatchFS() {
 	}
 }
 
+func piceventaction(event watcher.Event, w *watcher.Watcher) {
+	// this can be too fast: file might not be available yet even though the event was registered
+	time.Sleep(time.Millisecond * 10)
+
+	switch event.Op.String() {
+	case "CREATE":
+		reloadfsinfo(w)
+	case "REMOVE":
+		reloadfsinfo(w)
+	case "MOVE":
+		reloadfsinfo(w)
+	case "WRITE":
+		// not keeping track of this; but it potentially affects the file size accuracy
+		// but "touch" is also the equivalent of a write, and that is very uninteresting
+	default:
+		fmt.Printf("WatchFS() saw and skipped event.Op.String() '%s'\n", event.Op.String())
+	}
+}
+
 func reloadfsinfo(w *watcher.Watcher) {
 	ServingFiles.WriteAll(buildwatcherentries(w))
 	ServingFiles.SortByName()
@@ -69,14 +82,7 @@ func reloadfsinfo(w *watcher.Watcher) {
 	ServeFileMap.WriteAll(buildwatcherfmap())
 	ServingDirs.WriteAll(buildwatcherdirmap())
 	populaterestrictions()
-
-	//fmt.Println("reloadfsinfo()")
-	//sf := ServeFileMap.ReadAll()
-	//for k, entry := range sf {
-	//	fmt.Printf("%d - %s\n", k, entry.Name)
-	//}
-
-	buildfsresponse()
+	FSResponse.Set(fsdeephtml(), insertfilejs())
 }
 
 func findparentfromname(n string) FSEntry {
@@ -233,8 +239,4 @@ func contentsofthisdirectory(d FSEntry) []FSEntry {
 
 	slices.SortFunc(contents, func(a, b FSEntry) int { return cmp.Compare(a.RelPath, b.RelPath) })
 	return contents
-}
-
-func buildfsresponse() {
-	FSResponse.Set(fsdeephtml(), insertfilejs())
 }

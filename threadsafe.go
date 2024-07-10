@@ -10,6 +10,13 @@ import (
 // THREAD SAFE INFRASTRUCTURE: MUTEX
 //
 
+//
+// there are race conditions galore:
+// 	the FSEntry maps and slices can receive simultaneous reads/writes
+// 	so something has to be done to lock them
+// 	channels would work too; but mutex is the right tool for a simple job?
+//
+
 type fsresp struct {
 	HTML  string
 	JS    string
