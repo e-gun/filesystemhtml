@@ -20,7 +20,7 @@ const (
 // material icons
 const (
 	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>`
-	MILOCK   = `<span class="material-icons coolblue">locked</span>`
+	MILOCK   = `&nbsp;<span class="material--icons">lock</span>`
 	MIFC     = `<span class="material-icons orange">folder</span>`
 	MIFO     = `<span class="material-icons">folder_open</span>`
 	MIUNLOCK = `<span class="material-icons">folder_supervised</span>`
@@ -48,8 +48,8 @@ var (
 func fsdeephtml() string {
 	const (
 		TOP = `<div id="label">Browse</div>`
-		CNT = `%s<div id="contentsof_%d">`
-		DIV = `<div id="%d">%s</div>`
+		CNT = "%s<div id=\"contentsof_%d\">\n"
+		DIV = "<div id=\"%d\">%s</div>\n"
 	)
 
 	if len(ServingFiles) == 0 {
@@ -136,9 +136,11 @@ func onedirhtml(f FSEntry) string {
 
 	var chunks []string
 
+	chunks = append(chunks, "\n\t")
 	for _ = range f.Level {
 		chunks = append(chunks, SPACER)
 	}
+	chunks = append(chunks, "\n")
 
 	if f.IsUniversalRead() {
 		chunks = append(chunks, fmt.Sprintf(TEMPL, f.Inode, MyFStyle.Opn, f.Inode, MyFStyle.Clp))
@@ -160,11 +162,10 @@ func onedirhtml(f FSEntry) string {
 func onedochtml(f FSEntry) string {
 	const (
 		SPACER = `<span class="space">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</space>`
-		DOWN   = `<span class="downloadablefile">`
+		DOWN   = "\n\t<span class=\"downloadablefile\">"
 		FNOD   = `<file id="file_%d">`
-		FINF   = `<span class="entry">%s&nbsp(<span class="filesize">%s</span>)`
+		FINF   = "<span class=\"entry\">%s&nbsp(<span class=\"filesize\">%s</span>)\n"
 	)
-
 	var chunks []string
 
 	addindent := 1 // this is all about files at the top level of the directory
@@ -172,9 +173,11 @@ func onedochtml(f FSEntry) string {
 		addindent = 0
 	}
 
+	chunks = append(chunks, "\n\t")
 	for _ = range f.Level + addindent {
 		chunks = append(chunks, SPACER)
 	}
+	chunks = append(chunks, "\n")
 
 	if f.IsUniversalRead() {
 		toadd := fmt.Sprintf(FNOD, f.Inode) + DOWN + f.SetFileIcon()
@@ -187,7 +190,7 @@ func onedochtml(f FSEntry) string {
 
 	if f.IsUniversalRead() {
 		chunks = append(chunks, "</span>")
-		chunks = append(chunks, "</file>\n")
+		chunks = append(chunks, "</file>")
 	}
 
 	chunks = append(chunks, "</span><br>\n")

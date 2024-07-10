@@ -63,9 +63,17 @@ func WatchFS() {
 func reloadfsinfo(w *watcher.Watcher) {
 	ServingFiles = buildwatcherentries(w)
 	slices.SortFunc(ServingFiles, func(a, b FSEntry) int { return cmp.Compare(a.RelPath, b.RelPath) })
+
 	ServeFileMap.WriteAll(buildwatcherfmap())
 	ServingDirs.WriteAll(buildwatcherdirmap())
 	populaterestrictions()
+
+	//fmt.Println("reloadfsinfo()")
+	//sf := ServeFileMap.ReadAll()
+	//for k, entry := range sf {
+	//	fmt.Printf("%d - %s\n", k, entry.Name)
+	//}
+
 	FSResponse = buildfsresponse()
 }
 
@@ -217,7 +225,7 @@ func contentsofthisdirectory(d FSEntry) []FSEntry {
 			continue
 		}
 
-		ent := finfintofsentry(AbsPath+d.MyRelativePath(), inf)
+		ent := finfintofsentry(AbsPath+d.MyRelativePath()+"/"+fi.Name(), inf)
 		contents = append(contents, ent)
 	}
 

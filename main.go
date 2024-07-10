@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // as a package: start filesystemhtml.WatchFS() and then query filesystemhtml.FSResponse as needed
@@ -34,7 +35,8 @@ func main() {
 	}
 	AbsPath = abs + "/"
 
-	WatchFS()
+	go WatchFS()
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println("html")
 	fmt.Println(FSResponse[0])
 	fmt.Println("js")
