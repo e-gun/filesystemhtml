@@ -1,10 +1,46 @@
 package filesystemhtml
 
-import "sync"
+import (
+	"cmp"
+	"slices"
+	"sync"
+)
 
 //
 // THREAD SAFE INFRASTRUCTURE: MUTEX
 //
+
+func makeservinslice() servingslice {
+	return servingslice{
+		FSEs:  []FSEntry{},
+		mutex: sync.RWMutex{},
+	}
+}
+
+type servingslice struct {
+	FSEs  []FSEntry
+	mutex sync.RWMutex
+}
+
+func (ss *servingslice) WriteAll(ee []FSEntry) {
+	ss.mutex.Lock()
+	defer ss.mutex.Unlock()
+	ss.FSEs = ee
+	return
+}
+
+func (ss *servingslice) ReadAll() []FSEntry {
+	ss.mutex.Lock()
+	defer ss.mutex.Unlock()
+	return ss.FSEs
+}
+
+func (ss *servingslice) SortByName() {
+	ss.mutex.Lock()
+	defer ss.mutex.Unlock()
+	slices.SortFunc(ss.FSEs, func(a, b FSEntry) int { return cmp.Compare(a.RelPath, b.RelPath) })
+	return
+}
 
 func makeservingmap() servingmap {
 	return servingmap{

@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	ServingFiles []FSEntry
 	AbsPath      string
+	ServingFiles = makeservinslice()
 	ServingDirs  = makeservingmap()
 	ServeFileMap = makeservingmap()
 	FSResponse   [2]string
@@ -36,6 +36,8 @@ func WatchFS() {
 					// this can be too fast: file might not exist yet
 					time.Sleep(time.Millisecond * 10)
 					reloadfsinfo(w)
+				} else {
+					fmt.Printf("WatchFS() saw and skipped event.Op.String() '%s'\n", event.Op.String())
 				}
 			case err := <-w.Error:
 				log.Fatalln(err)
@@ -61,8 +63,8 @@ func WatchFS() {
 }
 
 func reloadfsinfo(w *watcher.Watcher) {
-	ServingFiles = buildwatcherentries(w)
-	slices.SortFunc(ServingFiles, func(a, b FSEntry) int { return cmp.Compare(a.RelPath, b.RelPath) })
+	ServingFiles.WriteAll(buildwatcherentries(w))
+	ServingFiles.SortByName()
 
 	ServeFileMap.WriteAll(buildwatcherfmap())
 	ServingDirs.WriteAll(buildwatcherdirmap())
@@ -79,7 +81,7 @@ func reloadfsinfo(w *watcher.Watcher) {
 
 func findparentfromname(n string) FSEntry {
 	var parent FSEntry
-	for _, sf := range ServingFiles {
+	for _, sf := range ServingFiles.ReadAll() {
 		if sf.MyRelativePath() == n && sf.IsDir {
 			parent = sf
 			break
@@ -90,7 +92,7 @@ func findparentfromname(n string) FSEntry {
 
 func buildwatcherfmap() map[uint64]FSEntry {
 	sf := make(map[uint64]FSEntry)
-	for _, f := range ServingFiles {
+	for _, f := range ServingFiles.ReadAll() {
 		if !f.IsDir {
 			sf[f.Inode] = f
 		}
@@ -100,7 +102,7 @@ func buildwatcherfmap() map[uint64]FSEntry {
 
 func buildwatcherdirmap() map[uint64]FSEntry {
 	sd := make(map[uint64]FSEntry)
-	for _, f := range ServingFiles {
+	for _, f := range ServingFiles.ReadAll() {
 		if f.IsDir {
 			sd[f.Inode] = f
 		}
