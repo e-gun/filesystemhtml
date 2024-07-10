@@ -21,7 +21,7 @@ const (
 const (
 	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>`
 	MILOCK   = `<span class="material-icons">folder_supervised</span>`
-	MIBLOCK  = `<span class="material-icons color2">shield_locked</span>`
+	MIBLOCK  = `<span class="material-icons color2">locked</span>`
 	MIFC     = `<span class="material-icons color1">folder</span>`
 	MIFO     = `<span class="material-icons">folder_open</span>`
 	MIUNLOCK = `<span class="material-icons">folder_supervised</span>`

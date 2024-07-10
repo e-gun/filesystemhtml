@@ -2,7 +2,9 @@ package filesystemhtml
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 )
 
 // as a package: start filesystemhtml.WatchFS() and then query filesystemhtml.FSResponse as needed
@@ -25,6 +27,12 @@ func main() {
 			FSDir = args[i+1]
 		}
 	}
+
+	abs, err := filepath.Abs(FSDir)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	AbsPath = abs + "/"
 
 	WatchFS()
 	fmt.Println("html")

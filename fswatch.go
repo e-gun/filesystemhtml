@@ -15,8 +15,6 @@ import (
 	"time"
 )
 
-// todo: address the many race condition candidates...
-
 var (
 	ServingFiles []FSEntry
 	AbsPath      string
@@ -218,6 +216,7 @@ func contentsofthisdirectory(d FSEntry) []FSEntry {
 			fmt.Println(fmt.Sprintf("contentsofthisdirectory() fi.Info() failed for '%s'", fi.Name()))
 			continue
 		}
+
 		ent := finfintofsentry(AbsPath+d.MyRelativePath(), inf)
 		contents = append(contents, ent)
 	}
