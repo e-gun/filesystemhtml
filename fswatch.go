@@ -68,7 +68,7 @@ func piceventaction(event watcher.Event, w *watcher.Watcher) {
 	case "MOVE":
 		reloadfsinfo(w)
 	case "WRITE":
-		// not keeping track of this; but it potentially affects the file size accuracy
+		// not keeping track of this; it potentially affects the file size accuracy
 		// but "touch" is also the equivalent of a write, and that is very uninteresting
 	default:
 		fmt.Printf("WatchFS() saw and skipped event.Op.String() '%s'\n", event.Op.String())
