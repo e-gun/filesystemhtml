@@ -72,30 +72,50 @@ func (f *FSEntry) IsChildOfReadableParents() bool {
 	return canread
 }
 
+//var DocIcons = map[string]string{
+//	".mp4":  "video_file",
+//	".m4v":  "video_file",
+//	".avi":  "video_file",
+//	".flv":  "video_file",
+//	".wmv":  "video_file",
+//	".mp3":  "audio_file",
+//	".ogg":  "audio_file",
+//	".wav":  "audio_file",
+//	".aac":  "audio_file",
+//	".pdf":  "picture_as_pdf",
+//	".doc":  "file_present",
+//	".docx": "file_present",
+//	".txt":  "article",
+//	".jpg":  "image",
+//	".jpeg": "image",
+//	".png":  "image",
+//	".gif":  "image",
+//}
+
 var DocIcons = map[string]string{
-	".mp4":  "video_file",
-	".m4v":  "video_file",
-	".avi":  "video_file",
-	".flv":  "video_file",
-	".wmv":  "video_file",
-	".mp3":  "audio_file",
-	".ogg":  "audio_file",
-	".wav":  "audio_file",
-	".aac":  "audio_file",
-	".pdf":  "picture_as_pdf",
-	".doc":  "file_present",
-	".docx": "file_present",
-	".txt":  "article",
-	".jpg":  "image",
-	".jpeg": "image",
-	".png":  "image",
-	".gif":  "image",
+	".mp4":  "EB87",
+	".m4v":  "EB87",
+	".avi":  "EB87",
+	".flv":  "EB87",
+	".wmv":  "EB87",
+	".mp3":  "EB82",
+	".ogg":  "EB82",
+	".wav":  "EB82",
+	".aac":  "EB82",
+	".pdf":  "E415",
+	".doc":  "EA0E",
+	".docx": "EA0E",
+	".txt":  "EF42",
+	".jpg":  "E3F4",
+	".jpeg": "E3F4",
+	".png":  "E3F4",
+	".gif":  "E3F4",
 }
 
 func (s *FSEntry) SetFileIcon() string {
 	const (
-		DEFAULT = "file_open"
-		HTM     = `&nbsp;<span class="material-icons">%s</span>&nbsp;`
+		DEFAULT = "EAF3" // "file_open"
+		HTM     = `&nbsp;<span class="material-icons">&#x%s;</span>&nbsp;`
 	)
 
 	icon := DEFAULT

@@ -7,23 +7,21 @@ import (
 	"strings"
 )
 
-// jquery
-const (
-	DOCU   = `<span class="ui-icon ui-icon-document"></span>`
-	LOCK   = `<span class="ui-icon ui-icon-locked"></span>`
-	BLOCK  = `<span class="ui-icon ui-icon-cancel"></span>`
-	FC     = `<span class="ui-icon ui-icon-folder-collapsed"></span>`
-	FO     = `<span class="ui-icon ui-icon-folder-open"></span>`
-	UNLOCK = `<span class="ui-icon ui-icon-locked"></span>`
-)
-
 // material icons; see also fsentry.go and SetFileIcon()
+//const (
+//	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>&nbsp;`
+//	MILOCK   = `&nbsp;<span class="material-icons">shield_lock</span>&nbsp;`
+//	MIFC     = `<span class="material-icons orange">folder</span>&nbsp;`
+//	MIFO     = `<span class="material-icons">folder_open</span>&nbsp;`
+//	MIUNLOCK = `<span class="material-icons">folder_supervised</span>&nbsp;`
+//)
+
 const (
-	MIDOCU   = `&nbsp;<span class="material-icons">file_open</span>&nbsp;`
-	MILOCK   = `&nbsp;<span class="material-icons">shield_lock</span>&nbsp;`
-	MIFC     = `<span class="material-icons orange">folder</span>&nbsp;`
-	MIFO     = `<span class="material-icons">folder_open</span>&nbsp;`
-	MIUNLOCK = `<span class="material-icons">folder_supervised</span>&nbsp;`
+	MIDOCU   = `&nbsp;<span class="material-icons">&#xEAF3;</span>&nbsp;`
+	MILOCK   = `&nbsp;<span class="material-icons">&#xF686;</span>&nbsp;`
+	MIFC     = `<span class="material-icons orange">&#XE2C7;</span>&nbsp;`
+	MIFO     = `<span class="material-icons">&#xE2C8;</span>&nbsp;`
+	MIUNLOCK = `<span class="material-icons">&#xF774;</span>&nbsp;`
 )
 
 type FStyle struct {
