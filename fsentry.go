@@ -90,6 +90,8 @@ func (f *FSEntry) IsChildOfReadableParents() bool {
 //	".jpeg": "image",
 //	".png":  "image",
 //	".gif":  "image",
+//  ".gz":  "folder_zip",
+//  ".zip":  "folder_zip",
 //}
 
 var DocIcons = map[string]string{
@@ -110,6 +112,8 @@ var DocIcons = map[string]string{
 	".jpeg": "E3F4",
 	".png":  "E3F4",
 	".gif":  "E3F4",
+	".gz":   "EB2C",
+	".zip":  "EB2C",
 }
 
 func (s *FSEntry) SetFileIcon() string {
