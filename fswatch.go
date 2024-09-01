@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"github.com/e-gun/safestack"
 	"github.com/radovskyb/watcher"
 	"io/fs"
 	"log"
@@ -22,20 +23,24 @@ var (
 	ServeFileMap = makeservingmap()
 	FSResponse   = makefsresp()
 	FSDir        string
+	NeedReload   = safestack.NewSafeStack([]bool{})
 )
 
 func WatchFS() {
 	w := watcher.New()
 
+	NeedReload.NewMax(1)
+	NeedReload.Push(false)
+
 	go func() {
 		for {
 			select {
-			case event := <-w.Event:
-				// fmt.Println(event) // Print the event's info.
-				piceventaction(event, w)
+			case <-w.Event:
+				NeedReload.Push(true)
 			case err := <-w.Error:
 				log.Fatalln(err)
 			case <-w.Closed:
+				fmt.Println("watcher closed")
 				return
 			}
 		}
@@ -48,34 +53,28 @@ func WatchFS() {
 		return
 	}
 
-	reloadfsinfo(w)
+	ReloadFSInfo(w)
 
-	// Start the watching process
+	go func() {
+		for {
+			time.Sleep(time.Second * 1)
+			y, _ := NeedReload.Peek()
+			// fmt.Printf("WatchFS() need reload: %v\n", y)
+			if y {
+				NeedReload.Push(false)
+				ReloadFSInfo(w)
+			}
+		}
+	}()
+
+	// Start the watching process; note that .Start() blocks and WatchFS() ends here and never returns
 	if e := w.Start(time.Second * 1); e != nil {
 		log.Fatalln(e)
 	}
 }
 
-func piceventaction(event watcher.Event, w *watcher.Watcher) {
-	// this can be too fast: file might not be available yet even though the event was registered
-	time.Sleep(time.Millisecond * 10)
-
-	switch event.Op.String() {
-	case "CREATE":
-		reloadfsinfo(w)
-	case "REMOVE":
-		reloadfsinfo(w)
-	case "MOVE":
-		reloadfsinfo(w)
-	case "WRITE":
-		// not keeping track of this; it potentially affects the file size accuracy
-		// but "touch" is also the equivalent of a write, and that is very uninteresting
-	default:
-		fmt.Printf("WatchFS() saw and skipped event.Op.String() '%s'\n", event.Op.String())
-	}
-}
-
-func reloadfsinfo(w *watcher.Watcher) {
+func ReloadFSInfo(w *watcher.Watcher) {
+	// fmt.Println("ReloadFSInfo")
 	ServingFiles.WriteAll(buildwatcherentries(w))
 	ServingFiles.SortByName()
 
